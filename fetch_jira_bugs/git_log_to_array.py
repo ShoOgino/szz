@@ -10,9 +10,9 @@ import sys
 import json
 from pydriller import GitRepository, RepositoryMining, domain
 
-def git_log_to_json(init_hash, path_to_repo):
+def git_log_to_json(commitFrom, pathRepository):
     d=[]
-    for commit in RepositoryMining(path_to_repo).traverse_commits():
+    for commit in RepositoryMining(pathRepository, to_commit=commitFrom).traverse_commits():
         row={}
         row["id"]=commit.hash
         row["date"]=commit.committer_date.strftime("%Y-%m-%d %H:%M:%S %z")#2020-07-24 23:52:45 +0200
@@ -27,13 +27,13 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description="""Convert a git log output to json.
                                                  """)
-    parser.add_argument('--from-commit', type=str,
+    parser.add_argument('--commitFrom', type=str,
             help="A SHA-1 representing a commit. Runs git rev-list from this commit.")
-    parser.add_argument('--repo-path', type=str,
+    parser.add_argument('--pathRepository', type=str,
             help="The absolute path to a local copy of the git repository from where the git log is taken.")
 
     args = parser.parse_args()
-    path_to_repo = args.repo_path
-    init_hash = args.from_commit
-    git_log_to_json(init_hash, path_to_repo)
+    pathRepository = args.pathRepository
+    commitFrom = args.commitFrom
+    git_log_to_json(commitFrom, pathRepository)
 
