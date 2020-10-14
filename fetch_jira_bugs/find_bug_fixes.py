@@ -12,7 +12,7 @@ def find_bug_fixes(issue_path, gitlog_path):
 
     for key in issues:
         commitsMatched = []
-        pattern = r'{key}\D|{key}$'.format(key=key)
+        pattern = r'\W${key}\W|\W${key}$'.format(key=key)
         for commit in commits:
             if re.search(pattern, commit["comment"]):
                 commitsMatched.append(commit)
