@@ -54,9 +54,13 @@ def fetch(project_issue_code, jira_project_name, pathOutput):
                 d["issues"].append(row)
         print('|', end='', flush='True')
         start_at += max_results
-    os.makedirs(pathOutput, exist_ok=True)
-    with open(os.path.join(pathOutput, 'reports.json'), 'w', encoding="utf-8") as f:
-        json.dump(d, f, indent=4)
+    if(0<len(pathOutput)):
+        os.makedirs(pathOutput, exist_ok=True)
+        with open(os.path.join(pathOutput, 'reports.json'), 'w', encoding="utf-8") as f:
+            json.dump(d, f, indent=4)
+    else:
+        with open('reports.json', 'w', encoding="utf-8") as f:
+            json.dump(d, f, indent=4)
 
     print('\nDone!')
 
