@@ -12,18 +12,15 @@ def find_bug_fixes(issue_path, gitlog_path):
 
     for key in issues:
         commitsMatched = []
-        pattern = r'\W${key}\W|\W${key}$'.format(key=key)
+        pattern = r'^{key}$|^{key}\W|\W{key}\W|\W{key}$'.format(key=key)
         for commit in commits:
             if re.search(pattern, commit["comment"]):
                 commitsMatched.append(commit)
         if commitsMatched:
-            selected_commit = commit_selector_heuristic(commitsMatched)
-            if not selected_commit:
-                issuesUnmatched.append(key)
-            else:
-                print("match: " + pattern)
-                issues[key]['hash'] = selected_commit["id"]
-                issues[key]['commitdate'] = selected_commit["date"]
+            for i, commitMatched in enumerate(commitsMatched):
+                print("   match: " + pattern + " " + str(i))
+                issues[key+"_"+str(i)]['hash'] = t["id"]
+                issues[key+"_"+str(i)]['commitdate'] = selected_commit["date"]
         else:
             print("no match: " + pattern)
             issuesUnmatched.append(key)
@@ -52,16 +49,6 @@ def build_issue_list(path):
             res_date = res_date.replace('.000', ' ')
             issues[issue['key']]['resolutiondate'] = res_date
     return issues
-
-def commit_selector_heuristic(commits):
-    """ Helper method for find_bug_fixes.
-    Commits are assumed to be ordered in reverse chronological order.
-    Given said order, pick first commit that does not match the pattern.
-    If all commits match, return newest one. """
-    for commit in commits:
-        if not re.search('[Mm]erge|[Cc]herry|[Nn]oting', commit["comment"]):
-            return commit
-    return commits[0]
 
 def main():
     """ Main method """
