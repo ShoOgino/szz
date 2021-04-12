@@ -2,53 +2,45 @@ import os
 import json
 import re
 import argparse
+from tqdm import tqdm
 
-def find_bug_fixes(issue_path, gitlog_path):
-    issues = build_issue_list(issue_path)
+def find_bug_fixes(pathReport, pathCommits):
+    with open(pathReport, encoding="utf-8") as f:
+        reports = json.loads(f.read())["issues"]
+    bugfixes = {}
     issuesUnmatched = []
     commits = []
-    with open(gitlog_path, encoding="utf_8") as f:
+    with open(pathCommits, encoding="utf_8") as f:
         commits = json.loads(f.read())
 
-    for key in issues:
+    for report in tqdm(reports):
+        count = 0
         commitsMatched = []
+        key = report["key"]
         pattern = r'^{key}$|^{key}\W|\W{key}\W|\W{key}$'.format(key=key)
         for commit in commits:
             if re.search(pattern, commit["comment"]):
-                commitsMatched.append(commit)
-        if commitsMatched:
-            for i, commitMatched in enumerate(commitsMatched):
-                print("   match: " + pattern + " " + str(i))
-                issues[key+"_"+str(i)]['hash'] = t["id"]
-                issues[key+"_"+str(i)]['commitdate'] = selected_commit["date"]
-        else:
-            print("no match: " + pattern)
+                #print("   match: " + pattern + " " + str(count))
+                bugfixes[key+"_"+str(count)]={}
+                bugfixes[key+"_"+str(count)]['hash'] = commit["id"]
+                bugfixes[key+"_"+str(count)]['commitdate'] = commit["date"]
+                created_date = report['fields']['created'].replace('T', ' ')
+                created_date = created_date.replace('.000', ' ')
+                bugfixes[key+"_"+str(count)]['creationdate'] = created_date
+                res_date = report['fields']['resolutiondate'].replace('T', ' ')
+                res_date = res_date.replace('.000', ' ')
+                bugfixes[key+"_"+str(count)]['resolutiondate'] = res_date
+                count+=1
+        if count == 0:
+            #print("no match: " + pattern)
             issuesUnmatched.append(key)
 
-    print('Total issues: ' + str(len(issues)))
-    print('Issues matched to a bugfix: ' + str(len(issues) - len(issuesUnmatched)))
+    print('Total issues: ' + str(len(reports)))
+    print('Issues matched to a bugfix: ' + str(len(reports) - len(issuesUnmatched)))
     print('Percent of issues matched to a bugfix: ' + \
-          str((len(issues) - len(issuesUnmatched)) / len(issues)))
-    for key in issuesUnmatched:
-        issues.pop(key)
+          str((len(reports) - len(issuesUnmatched)) / len(reports)))
 
-    return issues
-
-
-def build_issue_list(path):
-    issues = {}
-    with open(path, encoding="utf-8") as f:
-        for issue in json.loads(f.read())['issues']:
-            issues[issue['key']] = {}
-
-            created_date = issue['fields']['created'].replace('T', ' ')
-            created_date = created_date.replace('.000', ' ')
-            issues[issue['key']]['creationdate'] = created_date
-
-            res_date = issue['fields']['resolutiondate'].replace('T', ' ')
-            res_date = res_date.replace('.000', ' ')
-            issues[issue['key']]['resolutiondate'] = res_date
-    return issues
+    return bugfixes
 
 def main():
     """ Main method """

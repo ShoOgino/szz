@@ -29,7 +29,7 @@ def getPathInput(path):
     if(0<len(path)):
         pathInput=path
     else:
-        pathInput="results/annotations.json"
+        pathInput="annotations.json"
     return pathInput
 
 def getPathOutput(path):
@@ -37,7 +37,7 @@ def getPathOutput(path):
     if(0<len(path)):
         pathOutput=path
     else:
-        pathOutput="bugintros.json"
+        pathOutput="bugs.json"
     return pathOutput
 
 
