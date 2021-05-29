@@ -17,15 +17,14 @@ def fetch(project_issue_code, jira_project_name, pathOutput):
     # Jira Query Language string which filters for resolved issues of type bug
     jql = 'project = ' + project_issue_code + ' ' \
         + 'AND issuetype = Bug '\
-        + 'AND status in (Resolved, Closed) '\
-        + 'AND resolution = Fixed'
+        + 'AND status in (Resolved, Closed) '
     jql = quote(jql, safe='')
 
     start_at = 0
 
     # max_results parameter is capped at 1000, specifying a higher value will
     # still return only the first 1000 results
-    max_results = 1000
+    max_results = 100
 
     request = 'https://' + jira_project_name + '/rest/api/2/search?'\
         + 'jql={}&startAt={}&maxResults={}'
@@ -37,8 +36,9 @@ def fetch(project_issue_code, jira_project_name, pathOutput):
         total = contents['total']
 
     # Fetch all matching issues and write to file(s)
-    print(request.format(jql, start_at, max_results))
+    print(request.format(jql, start_at, '1'))
     print('Total issue matches: ' + str(total))
+
     d={}
     d["total"]=total
     d["issues"]=[]
