@@ -18,6 +18,12 @@ def fetch(owner, project, pathOutput):
         print(url)
         res = requests.get(url)
         issues = json.loads(res.text)
+        for issue in issues:
+            issue["key"]=str(issue["number"])
+            dateCreated = issue["created_at"]
+            dateResolved = issue["closed_at"]
+            fields = {"created":dateCreated, "resolutiondate":dateResolved}
+            issue["fields"]=fields
         if(len(issues)==0):
             break
         d["issues"].extend(issues)
@@ -26,7 +32,6 @@ def fetch(owner, project, pathOutput):
 
     with open('reports.json', 'w', encoding="utf-8") as f:
         json.dump(d, f, indent=4)
-
 
 #while start_at < total:
 #    with url.urlopen(request.format(jql, start_at, max_results)) as conn:
