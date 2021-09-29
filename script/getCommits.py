@@ -6,8 +6,8 @@ from pydriller import Repository, ModificationType
 import csv
 
 def git_log_to_json(pathRepository, commitFrom):
-    pathRepository = r"C:\Users\login\work\buggyChangeLocater\projects\egit\repositoryFile"
-    commitFrom = "0cbb04ecfc12240f87b3c060b576db97d5debf78"
+    pathRepository = r"C:\Users\login\work\buggyChangeLocater\projects\egit\repositoryMethod"
+    commitFrom = "b459d7381ea57e435bd9b71eb37a4cb4160e252b"
     commits = []
     for i, commit in enumerate(Repository(pathRepository, to_commit=commitFrom).traverse_commits()):
         comment = commit.msg.replace("\r\n", " ").replace("\n", " ").replace("\r", " ").replace("	", " ")
@@ -22,7 +22,7 @@ def git_log_to_json(pathRepository, commitFrom):
         row={}
         row["id"]=i#commit.hash
         row["author"]=commit.author.name
-        row["date"]=int(commit.committer_date.timestamp())#.strftime("%Y-%m-%d %H:%M:%S %z")#2020-07-24     23:52:45 +0200
+        row["date"]=str(int(commit.committer_date.timestamp()))+"000"#.strftime("%Y-%m-%d %H:%M:%S %z")#2020-07-24     23:52:45 +0200
         row["comment"] = comment
         commits.append(row)
     with open('commits.csv', 'w', encoding="utf-8", newline="") as f:
